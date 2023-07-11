@@ -11,8 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # ESGAP WOLRD
 
-Ce document permet de suivre l'avancement du code pour traiter les données afin de produire l'Esgap au niveau mondial
-Les explications suivantes sont données pour aider et pour reprendre le code pour une prochaine personne si nécessaire
+Ce document contient et permet de suivre l'évolution du code pour traiter les données afin de produire l'Esgap au niveau global.
 
 ## étape 1 : Charger les packages nécessaires
 ```{r echo=F, message=F}
@@ -22,115 +21,297 @@ library(tidyr)
 library(stringr)
 library(ggplot2)
 ```
-étant donné que nous ne sommes pas sur la dernire version de r, les packages ne sont pas à jour d'ou la présence de warnings
 
 ################################################################################################################################################################
 
 ## étape 2 : traiter les différents data pour les mettres sous la forme souhaité
+Dans cette étape, nous formatons les tableaux de données sous une même forme contenant les colonnes pays, variables, années 2015 à 2020.
 
 ### Premier topic : Renewable ressources
+```{r echo=T}
+Countries<-read.csv("Countries.csv",sep=";")
+```
+Ce tableau nous permettra de standardiser les noms des pays pour chaque indicateur. Cela permet de s'assurer que les pays disposent d'un SESI qui prend en compte le nombre maximum d'indicateurs.
+!! penser à transformer les "," de certaines base de données en "."
 
-#### **Forest ressources** 
-correspond aux couvert forestier en hectare par pays
+#### **Percentage of forest cover per biome compare to the biome functional cover** 
+poucentage de couvert forestier par rapport aux biomes fonctionnels de forêt du pays
 ```{r echo=T}
 Tree<-read.csv("tree_coverage.csv",sep=";")%>%
     select(Country,Variable,c(4:9))
-Tree<-as.data.frame(apply(Tree, 2, as.character))
-```
-Le tableau provient de Fao et aucune donnée n'existe avant 2015. Les données correspondent au SDG 15.1.1.Le fait qu'aucune données n'existe avant 2015 posera porblème pour le calcul de l'indicateur pour l'année 2015
 
-#### **Marine ressources** 
+#Ces lignes permettent de normaliser les noms des pays pour le tableau Tree
+correspondances <- match(Tree$Country, Countries$Tree)
+Tree$Country<-Countries$Name[correspondances]
+Tree <- Tree[complete.cases(Tree$Country), ]
+#
+
+Biome<-read.csv("Biome_foret.csv",sep=";")%>%
+  group_by(Country,layer_id)%>%
+  filter(layer_id=="Boreal" | layer_id=="Temperate" | layer_id=="Tropical")%>%
+  summarize(area=sum(area))%>%
+  ungroup(Country,layer_id)
+
+correspondances <- match(Biome$Country, Countries$Biome)
+Biome$Country<-Countries$Name[correspondances]
+Biome <- Biome[complete.cases(Biome$Country), ]
+
+#1
+Biome<-full_join(Biome,Biome%>%
+  group_by(Country)%>%
+  summarize(area_tot=sum(area)))%>%
+  mutate(area_per=(area/area_tot))
+
+Tree<-full_join(Tree,Biome)%>%
+  mutate(area_2015=as.numeric(X2015)*area_per,
+         area_2016=as.numeric(X2016)*area_per,
+         area_2017=as.numeric(X2017)*area_per,
+         area_2018=as.numeric(X2018)*area_per,
+         area_2019=as.numeric(X2019)*area_per,
+         area_2020=as.numeric(X2020)*area_per)
+#
+
+
+#2
+Tree<-Tree%>%
+  group_by(Country,Variable,layer_id)%>%
+  summarize(X2015=area_2015/area*100,
+            X2016=area_2016/area*100,
+            X2017=area_2017/area*100,
+            X2018=area_2018/area*100,
+            X2019=area_2019/area*100,
+            X2020=area_2020/area*100)%>% 
+  mutate(X2015=ifelse(layer_id=="Boreal",
+                ifelse(X2015<60,0,
+                    ifelse(X2015>85,100,
+                           (X2015-85)/(60-85))),
+               ifelse(layer_id=="Temperate",
+                ifelse(X2015<30,0,
+                    ifelse(X2015>50,100,
+                           (X2015-50)/(30-50))),        
+               ifelse(layer_id=="Tropical",
+                ifelse(X2015<60,0,
+                    ifelse(X2015>85,100,
+                           (X2015-85)/(60-85))),NA))))%>%
+  
+   mutate(X2016=ifelse(layer_id=="Boreal",
+                ifelse(X2016<60,0,
+                    ifelse(X2016>85,100,
+                           (X2016-85)/(60-85))),
+               ifelse(layer_id=="Temperate",
+                ifelse(X2016<30,0,
+                    ifelse(X2016>50,100,
+                           (X2016-50)/(30-50))),        
+               ifelse(layer_id=="Tropical",
+                ifelse(X2016<60,0,
+                    ifelse(X2016>85,100,
+                           (X2016-85)/(60-85))),NA))))%>%
+  
+   mutate(X2017=ifelse(layer_id=="Boreal",
+                ifelse(X2017<60,0,
+                    ifelse(X2017>85,100,
+                           (X2017-85)/(60-85))),
+               ifelse(layer_id=="Temperate",
+                ifelse(X2017<30,0,
+                    ifelse(X2017>50,100,
+                           (X2017-50)/(30-50))),        
+               ifelse(layer_id=="Tropical",
+                ifelse(X2017<60,0,
+                    ifelse(X2017>85,100,
+                           (X2017-85)/(60-85))),NA))))%>%
+  
+   mutate(X2018=ifelse(layer_id=="Boreal",
+                ifelse(X2018<60,0,
+                    ifelse(X2018>85,100,
+                           (X2018-85)/(60-85))),
+               ifelse(layer_id=="Temperate",
+                ifelse(X2018<30,0,
+                    ifelse(X2018>50,100,
+                           (X2018-50)/(30-50))),        
+               ifelse(layer_id=="Tropical",
+                ifelse(X2018<60,0,
+                    ifelse(X2018>85,100,
+                           (X2018-85)/(60-85))),NA))))%>%
+  
+   mutate(X2019=ifelse(layer_id=="Boreal",
+                ifelse(X2019<60,0,
+                    ifelse(X2019>85,100,
+                           (X2019-85)/(60-85))),
+               ifelse(layer_id=="Temperate",
+                ifelse(X2019<30,0,
+                    ifelse(X2019>50,100,
+                           (X2019-50)/(30-50))),        
+               ifelse(layer_id=="Tropical",
+                ifelse(X2019<60,0,
+                    ifelse(X2019>85,100,
+                           (X2019-85)/(60-85))),NA))))%>%
+  
+   mutate(X2020=ifelse(layer_id=="Boreal",
+                ifelse(X2020<60,0,
+                    ifelse(X2020>85,100,
+                           (X2020-85)/(60-85))),
+               ifelse(layer_id=="Temperate",
+                ifelse(X2020<30,0,
+                    ifelse(X2020>50,100,
+                           (X2020-50)/(30-50))),        
+               ifelse(layer_id=="Tropical",
+                ifelse(X2020<60,0,
+                    ifelse(X2020>85,100,
+                           (X2020-85)/(60-85))),NA))))%>%
+  ungroup()
+  
+  Tree<-Tree%>%
+    group_by(Country,Variable)%>%
+    summarise(X2015=mean(X2015,na.rm=TRUE),
+              X2016=mean(X2016,na.rm=TRUE),
+              X2017=mean(X2017,na.rm=TRUE),
+              X2018=mean(X2018,na.rm=TRUE),
+              X2019=mean(X2019,na.rm=TRUE),
+              X2020=mean(X2020,na.rm=TRUE))
+#
+Tree<-as.data.frame(apply(Tree, 2, as.character))
+
+```
+Le tableau "Tree" correspond aux données de la FAO sur le couvert forestier pour chaque pays pour les années 2015 à 2020, et le tableau "Biome" correspond aux données de la Global Ecosystem Typology (GET) sur le couvert forestier fonctionnel. Les deux ensembles de données sont exprimés en kilomètres carrés (km2).
+
+(1)Notre objectif est d'obtenir le pourcentage de couverture forestière par rapport à la couverture des biomes forestiers fonctionnels. Initialement, nous disposions de données sur le couvert forestier total en km2 sans différenciation des biomes pour les années 2015-2020, ainsi que sur le couvert des biomes fonctionnels en km2. Pour atteindre notre objectif, nous devons déterminer la couverture forestière des différents biomes fonctionnels pour chaque année. Pour ce faire, nous appliquerons le pourcentage de chaque biome du tableau GET aux données annuelles de couverture forestière, ce qui nous donnera la couverture forestière de chaque biome spécifique par année.
+
+(2)Avec ces nouvelles valeurs, nous pouvons maintenant comparer la différence de couverture forestière entre les biomes fonctionnels et la couverture forestière pour les années sélectionnées.
+
+#### **Proportion of fish stocks within biological sustainable level** 
 correspond à la proportion de stocks de poisson qui ne sont pas surexploités
 ```{r echo=F}
-fishsust<-read.csv("Fish_msy_regionCo.csv", sep = ";")%>%
+fishsust<-read.csv("Fish_msy_region.csv", sep = ";")%>%
   group_by(Country,Variable)%>%
-  summarize(#fait la moyenne du MSY des différentes régions dans lequel opère le pays
-    X2017=mean(X2017, na.rm=TRUE),
-    X2015=mean(X2015,na.rm=TRUE),.groups = )%>%
-  ungroup()
-fishsust<-as.data.frame(apply(fishsust, 2, as.character)) #mettre tout sous le même format
+  #1
+  summarize(X2017=mean(X2017, na.rm=TRUE),
+            X2015=mean(X2015,na.rm=TRUE))%>%
+  ungroup()%>%
+  #
+  
+  #2
+  mutate(X2016=X2015,
+         X2018=X2017,
+         X2019=X2017,
+         X2020=X2017)
+  #
+correspondances <- match(fishsust$Country, Countries$Fishstut)
+fishsust$Country<-Countries$Name[correspondances]
+fishsust <- fishsust[complete.cases(fishsust$Country), ]
+fishsust<-as.data.frame(apply(fishsust, 2, as.character))
 ```
-Le tableau a été fait à la main à partir des données sur la proportion de stock non surexploité (indicateur 14.4.1) par région majeur de pêche de la FAO.
-Pour otenir les données par pays nous avons fait la moyenne de toutes les régions dans lequel un pays pouvais pécher. Cela signifie que si un pays possède les mêmes régions de pêche qu'un autre alors les deux obtiendront une valeur similaire. Différentes propositions ont été apportés pour améliorer l'indicateur par exemple prendre en compte la taille de la flotte de chaque pays
-dans chaque région du monde
+Le tableau a été compilé à la main à partir des données sur la proportion du stock non surexploité (indicateur 14.4.1) par grande région de pêche de la FAO.
+(1) Pour obtenir les données par pays, nous avons fait la moyenne de toutes les régions dans lesquelles un pays pouvait pêcher. 
+(2)Pour les années sans valeur, nous utilisons la valeur de l'année précédente la plus proche si cela est possible, ou la valeur de l'année la plus proche si cela n'est pas possible.
 
-#### **surface water ressources**
+#### **Percentage of freshwater withdrawn compare to 25% of total annual renewable freshwater**
 
 correspond au stress hydrique subit par les différentes sources d'eau fraiches dans le pays (ne prend pas en compte les aquifères)
 ```{r echo=F}
 waterstress<-read.csv("Waterstress.csv",sep=";")
-#faire attention à transformer les virgules en . et supprimer les espaces quand 
-#>1000 sur excel
 waterstress<-waterstress %>%
   select(Country,Variable,c(11:16))%>%
   group_by(Country,Variable)%>%
+  #1
   summarize(X2015=mean(X2015,na.rm=TRUE),
             X2016=mean(X2016,na.rm=TRUE),
             X2017=mean(X2017,na.rm=TRUE),
             X2018=mean(X2018,na.rm=TRUE),
             X2019=mean(X2019,na.rm=TRUE),
             X2020=mean(X2020,na.rm=TRUE))%>%
-  ungroup#du à un changement dans la prise de valeur en 2017 certains pays existe sur plusieurs lignes, cela n'impacte pas le résultat
-#récupération uniquemnt des colonnes que l'on veut
+  ungroup
+  #
+
+correspondances <- match(waterstress$Country, Countries$Waterstress)
+waterstress$Country<-Countries$Name[correspondances]
+waterstress <- waterstress[complete.cases(waterstress$Country), ]
 waterstress<-as.data.frame(apply(waterstress, 2, as.character))
-
 ```
-Le tableau a été récupéré sur le site de la FAO (indicateur 6.4.2) qui correspond à la proportion d'eau utilisé en comparaison à la quantité d'eau disponible dans le pays. 
+Le tableau a été récupéré sur le site de la FAO (indicateur 6.4.2), qui correspond à la proportion d'eau utilisée par rapport à la quantité d'eau disponible dans le pays.
+(1) Certains pays ont changé de méthode de calcul d'une année sur l'autre et apparaissent donc sur plusieurs lignes. D'une manière générale, les valeurs ne changent pas ou peu, nous avons donc décidé de tout regrouper sur une seule ligne, en faisant la moyenne des deux méthodes si deux valeurs existent pour le pays et l'année. S'il n'y a qu'une seule valeur existante, elle est prise telle quelle.
 
-#### **groundwater ressources**
+#### **Percentage of groundwater withdrawn compare 25% of annual groundwater resource.**
 
 correspond au bon état des eaux souterraines dans le pays (c'est à dire pas de surconsommation)
 ```{r echo=F}
-prodwat<-read.csv("produced_groundwater.csv",sep = ";")%>% #tableau regroupant la production interne de groundwater
-  #faire attention à transformer les virgules en . et supprimer les espaces quand 
-#>1000 sur excel
+
+#\tableau Groundwater produced internally
+prodwat<-read.csv("produced_groundwater.csv",sep = ";")%>%
   group_by(Country)%>%
   summarize(X2015=sum(X2015,na.rm = TRUE),X2016=sum(X2016,na.rm= TRUE),X2017=sum(X2017,na.rm= TRUE),X2018=sum(X2018,na.rm= TRUE),X2019=sum(X2019,na.rm= TRUE),X2020=sum(X2020,na.rm= TRUE))
 
-#suppresion des colonnes en trop et aggregation des lignes imputed et official value 
-#(les  imputed values remplacent les officials à partir de 2019, il y a donc une ligne pour chaque valeur mais il n'y a qu'une valeur pour chaque année)
+
+correspondances <- match(prodwat$Country, Countries$produced_GW)
+prodwat$Country<-Countries$Name[correspondances]
+prodwat <- prodwat[complete.cases(prodwat$Country), ]
+
+#\tableau Groundwater: accounted inflow
 inflowwat<-read.csv("inflow_wat.csv",sep=";")%>% 
   group_by(Country)%>%
   summarize(Y2015=sum(X2015,na.rm = TRUE),Y2016=sum(X2016,na.rm= TRUE),Y2017=sum(X2017,na.rm= TRUE),Y2018=sum(X2018,na.rm= TRUE),Y2019=sum(X2019,na.rm= TRUE),Y2020=sum(X2020,na.rm= TRUE))
 
+
+correspondances <- match(inflowwat$Country, Countries$inflow_GW)
+inflowwat$Country<-Countries$Name[correspondances]
+inflowwat <- inflowwat[complete.cases(inflowwat$Country), ]
+
+#1
 prodwat<-full_join(prodwat,inflowwat)%>%  
   group_by(Country)%>%
-  summarize(#calcul pour obtenir l'état des sources d'eau souterraines
-    X2015=Y2015+X2015, 
-    X2016=Y2016+X2016,
-    X2017=Y2017+X2017,
-    X2018=Y2018+X2018,
-    X2019=Y2019+X2019,
-    X2020=Y2020+X2020)%>%
+  summarize(X2015=Y2015+X2015,
+            X2016=Y2016+X2016,
+            X2017=Y2017+X2017,
+            X2018=Y2018+X2018,
+            X2019=Y2019+X2019,
+            X2020=Y2020+X2020)%>%
   ungroup()
-  write.csv(inflowwat,paste0("inflowwater",".csv"))
+#
+
+#\
 freshwat<-read.csv("Fresh_groundwater.csv",sep = ";")%>% 
-  #tableau regroupant l'usage de fresh water
   group_by(Country)%>%
-  summarize(Y2015=sum(X2015,na.rm = TRUE),Y2016=sum(X2016,na.rm= TRUE),Y2017=sum(X2017,na.rm= TRUE),Y2018=sum(X2018,na.rm= TRUE),Y2019=sum(X2019,na.rm= TRUE),Y2020=sum(X2020,na.rm= TRUE))
-#suppresion des colonnes en trop et modification des variables dates pour qu'elles existent toujours lors du join des deux tableaux (voir suite)
+  #2
+  summarize(Y2015=sum(X2015,na.rm = TRUE),
+            Y2016=sum(X2016,na.rm= TRUE),
+            Y2017=sum(X2017,na.rm= TRUE),
+            Y2018=sum(X2018,na.rm= TRUE),
+            Y2019=sum(X2019,na.rm= TRUE),
+            Y2020=sum(X2020,na.rm= TRUE))
+  #
+
+correspondances <- match(prodwat$Country, Countries$inflow_GW)
+prodwat$Country<-Countries$Name[correspondances]
+prodwat <- prodwat[complete.cases(prodwat$Country), ]
 
 groundwat<-full_join(prodwat,freshwat)%>%
-  #join des deux tableaux avec Xdate pour la groundwater produite et Ydate pour la groundwater consummé
   group_by(Country)%>%
-  summarize(#calcul pour obtenir l'état des sources d'eau souterraines
-    X2015=Y2015/X2015*100, 
-    X2016=Y2016/X2016*100,
-    X2017=Y2017/X2017*100,
-    X2018=Y2018/X2018*100,
-    X2019=Y2019/X2019*100,
-    X2020=Y2020/X2020*100)%>%
+  #3
+  summarize(X2015=Y2015/X2015*100,
+            X2016=Y2016/X2016*100,
+            X2017=Y2017/X2017*100,
+            X2018=Y2018/X2018*100,
+            X2019=Y2019/X2019*100,
+            X2020=Y2020/X2020*100)%>%
   ungroup()
+  #
+
 groundwat<-as.data.frame(apply(groundwat, 2, as.character))
-
 ```
-trois jeux de données on été récupéré sur Aquastat (Fresh groundwater withdrawal : utilisation de l'eau souteraine en 10^9m3/year, Groundwater: accounted inflow :  et Groundwater produced internally : quantité de renouvellement de l'eau souterraine 10^9m3/year). (La quantité d'eau utilisé sur la quantité d'eau renouveller)*100 va nous donner la quantité d'eau renouvelé utilisé dans le pays. On considère le même proxy que pour le stress hydrique des eaux de surfaces la quantité d'eau utilisé doit être en dessous de 25% à la quantité d'eau renouvelé.
+trois ensembles de données ont été extraits d'Aquastat :
+Fresh groundwater withdrawal: utilisation de l'eau souterraine en 10^9m3/an
+Groundwater accounted inflow : quantité d'eau souterraine entrant dans le pays en 10^9m3/an
+Groundwater produced internally : quantité d'eau souterraine renouvelée en interne en 10^9m3/an.
+(1) addition des deux tableaux de production d'eau souterraine
+(2) regroupement des valeurs (raison similaire aux eaux de surface)
+(3) rapport entre les eaux souterraines utilisées et les eaux souterraines produites.
 
-#### **Soil**
+
+#### **Percentage of soil erosion per year compare to 2t/ha/year soil erosion**
 correspond à l'erosion du sol en T/ha/year
 ```{r echo=T}
 soil<-read.csv("GlobalErosion_2001_2012.csv",sep=";")%>%
   select(2:4)%>%
+  #1
   reframe(Country=Name,
          X2015=MEAN_2012,
          X2016=MEAN_2012,
@@ -138,46 +319,83 @@ soil<-read.csv("GlobalErosion_2001_2012.csv",sep=";")%>%
          X2018=MEAN_2012,
          X2019=MEAN_2012,
          X2020=MEAN_2012,)
+  #
+
+correspondances <- match(soil$Country, Countries$Erosion)
+soil$Country<-Countries$Name[correspondances]
+soil <- soil[complete.cases(soil$Country), ]
 soil<-as.data.frame(apply(soil, 2, as.character))
 ```
-!!! Les valeurs correspondent aux valeurs de 2001 et 2012 mais je les fait correspondre aux valeurs de 2015 2020 juste pour vérifier que le code fonctionne les valeurs ne sont pas donc pas bonnes pour ces années (cependant j'ai choisi 2015 2020 car ce sont des années ou ils manquent constamment des valeurs donc le SESI n'est déjà pas le plus représentatif)
+Le tableau a été extrait du site web de l'ESDAC et correspond à la quantité d'érosion des sols pour les années 2001 et 2012.
+(1) Nous nous intéressons aux années 2015 à 2020, mais aucune donnée plus récente n'a été trouvée. Nous utilisons donc la valeur 2012 comme valeur pour les années d'intérets.
 
 ################################################################################################################################################################
 
 ### deuxième topic : Sink function
-#### **CO2 emissions**
+#### **Percentage of CO2 emitted (CO2e) per capita above the 2°C climate target.**
 correspond à la production de CO2 du pays
 ```{r echo=T}
-GHG<-read.csv("GHG_emission.csv",sep=";")%>%
-  select(2,48:53)
+#\tableau émission de gaz à effet de serre (GHG) par pays
+GHG<-read.csv("GHG_emission.csv",sep=";")
+
+correspondances <- match(GHG$Country, Countries$GHG)
+GHG$Country<-Countries$Name[correspondances]
+GHG <- GHG[complete.cases(GHG$Country), ]
+
+#\tableau population par pays
 Pop<-read.csv("population.csv",sep=";")%>%
   select(1,5:10)
+
 colnames(Pop)[1:7]=c("Country","Y2015","Y2016","Y2017","Y2018","Y2019","Y2020")
+
+correspondances <- match(Pop$Country, Countries$population)
+Pop$Country<-Countries$Name[correspondances]
+Pop <- Pop[complete.cases(Pop$Country), ]
+
+#1
 GHG<-left_join(GHG,Pop)%>%
   group_by(Country)%>%
-    summarize(#calcul du GHG/peryear/percapita
-    X2015=as.numeric(X2015*10^6)/as.numeric(Y2015), 
-    X2016=as.numeric(X2016*10^6)/as.numeric(Y2016),
-    X2017=as.numeric(X2017*10^6)/as.numeric(Y2017),
-    X2018=as.numeric(X2018*10^6)/as.numeric(Y2018),
-    X2019=as.numeric(X2019*10^6)/as.numeric(Y2019),
-    X2020=as.numeric(X2020*10^6)/as.numeric(Y2020))%>%
+    summarize(X2015=mean(as.numeric(X2015*10^6)/as.numeric(Y2015)), 
+              X2016=mean(as.numeric(X2016*10^6)/as.numeric(Y2016)),
+              X2017=mean(as.numeric(X2017*10^6)/as.numeric(Y2017)), 
+              X2018=mean(as.numeric(X2018*10^6)/as.numeric(Y2018)),  
+              X2019=mean(as.numeric(X2019*10^6)/as.numeric(Y2019)),
+              X2020=mean(as.numeric(X2020*10^6)/as.numeric(Y2020)))%>%
   ungroup()
+#
+
 GHG<-as.data.frame(apply(GHG, 2, as.character))
 ```
-Les données ont été récupéré sur ESDAC pour les Gaz à effets de serres et la world bank pour la population par pays. le tableau des gaz à effet de serres est en millions de tonnes par années. Nous cherchons à avoir les valeurs en tonnes par an par capita d'ou le calcul.
+Les données ont été extraites de l'ESDAC pour les gaz à effet de serre et de la Banque mondiale pour la population par pays. Le tableau des gaz à effet de serre est en millions de tonnes par an.
+(1) Nous transformons les données en tCO_2 par habitant et par an. Nous divisons donc les émissions de GES par la population de chaque pays.
 
 #### **Ozone depletion**
 production d'HCFC par tonnes par an pour un pays. 
 ```{r echo=T}
 HCFC<-read.csv("HCFC_tot.csv",sep=";")
+
 HCFC<-HCFC[-1,]%>%
   select(1,2,10:15)%>%
-  mutate(X=ifelse(is.na(X) | X==0,0,0.005*as.numeric(X)))#transformation pour obtenir la valeur du proxy du pays (0.5% de sa consommation en HCFC par rapport à 2007)
-HCFC<-as.data.frame(apply(HCFC, 2, as.character))
+  #1
+  mutate(X=ifelse(is.na(X) | X==0,0,0.005*as.numeric(X)))
+  #
+
 colnames(HCFC)=c("Country","X2007","X2015","X2016","X2017","X2018","X2019","X2020")
+correspondances <- match(HCFC$Country, Countries$HCFC)
+HCFC$Country<-Countries$Name[correspondances]
+HCFC <- HCFC[complete.cases(HCFC$Country), ]
+HCFC<-as.data.frame(apply(HCFC, 2, as.character))
+
+#\Tableau agreement limit 
+control<-read.csv("Control_limHCFC.csv",sep=";")
+correspondances <- match(control$Country, Countries$Lim_HCFC)
+control$Country<-Countries$Name[correspondances]
+control <- control[complete.cases(control$Country), ]
+control<-as.data.frame(apply(control, 2, as.character))
+#
 ```
-Le HCFC est la principale molécule actuellement participant à la formation de la couche d'ozone (ODS : ozone depleting substance). Un des seuls indicateurs basé sur des valeurs de proxy différentes entre chaque pays. La valeur basse correspond à 0.5% de consomamtion d'HCFC en comparaison à la consommation de 2007 et la valeur haute correspond à une valeur control limit unique à chaque pays et réguler par des accords internationaux
+Les données ont été extraites de l'ozone secretariat. Le tableau est en HCFC production in ODP tonnes.
+(1)nous calculons le standard idéal du pays qui correspond à 5% de la consommation de 2007.
 
 #### **terrestrial ecosystems exposed to safe ozone levels**
 ```{r echo=T}
@@ -195,43 +413,64 @@ Le HCFC est la principale molécule actuellement participant à la formation de 
 ```
 
 
-#### **surface water bodies in good chemical status**
+#### **Percentage of surface water bodies in good chemical status**
 correspond au bon état chimique des eaux de surfaces (rivières et stagnantes)
 ```{r echo=T}
 SW_chem<-read.csv("SW_quality.csv",sep=";")
+
 SW_chem<-SW_chem%>%
-  select(7:9,22)
-colnames(SW_chem)=c("Country","Year","Value","Variable")
-SW_chem<-SW_chem%>%
+  select(7:9,22)%>%
   pivot_wider(names_from = Year, values_from = Value)
 colnames(SW_chem)=c("Country","Variable","X2017","X2020")
 SW_chem<-SW_chem%>%
   group_by(Country)%>%
   summarize(Variable="Proportion of surface water bodies in good chemical status",
+            #1
             X2017=mean(X2017,na.rm=TRUE),
-          X2020=mean(X2020,na.rm=TRUE))
+            X2020=mean(X2020,na.rm=TRUE))%>%
+            #
+  #2
+  mutate(X2015=X2017,
+         X2016=X2017,
+         X2018=X2017,
+         X2019=X2017)
+  #
+correspondances <- match(SW_chem$Country, Countries$SW_chem)
+SW_chem$Country<-Countries$Name[correspondances]
+SW_chem <- SW_chem[complete.cases(SW_chem$Country), ]
 SW_chem<-as.data.frame(apply(SW_chem, 2, as.character))
-
 ```
-Les données ont été récupérés sur GEMS (Global Environment Monitoring Systems) et correspondent à l'indicateur 6.3.2 des SDG. Dans notre cas,nous nous concentrons sur les rivières et les open water bodies. Le problème assez visible est que moins de la moitié des pays semblent renseigner et même dans parmi les pays renseignés beaucoup de valeurs sont manquantes.
+Les données des eaux de surface pour les années 2017 et 2020 ont été extraites de GEMS (Global Environment Monitoring Systems) et correspondent à l'indicateur 6.3.2 des ODD.
+(1)Les rivières et les plans d'eau sont différenciés dans les données de chaque pays. Ainsi, nous faisons la moyenne des deux types de surface d'eau pour obtenir une valeur unique par pays et par année.
+(2)Pour les années sans valeur, nous utilisons la valeur de l'année précédente la plus proche si cela est possible, ou la valeur de l'année la plus proche si cela n'est pas possible.
 
-
-#### **groundwater bodies in good chemical status**
+#### **Percentage of groundwater bodies in good chemical status**
 correspond au bon état chimique des eaux souterraines (nappe phréatique)
 ```{r echo=T}
 GW_chem<-read.csv("GW_quality.csv",sep=",")
+
 GW_chem<-GW_chem%>%
   select(7:9,22)
-colnames(GW_chem)=c("Country","Year","Value","Variable")
 GW_chem<-GW_chem%>%
   distinct()%>%
   pivot_wider(names_from = Year, values_from = Value)
+
 colnames(GW_chem)=c("Country","Variable","X2017","X2020","SUP")
-GW_chem<-GW_chem%>%select(-contains("SUP"))
+#1
+GW_chem<-GW_chem%>%
+  select(-contains("SUP"))%>%
+  mutate(X2015=X2017,
+         X2016=X2017,
+         X2018=X2017,
+         X2019=X2017)
+#
+correspondances <- match(GW_chem$Country, Countries$GW_chem)
+GW_chem$Country<-Countries$Name[correspondances]
+GW_chem <- GW_chem[complete.cases(GW_chem$Country), ]
 GW_chem<-as.data.frame(apply(GW_chem, 2, as.character))
 ```
-Les données ont été récupérés sur GEMS (Global Environment Monitoring Systems) et correspondent à l'indicateur 6.3.2 des SDG. Dans notre cas,nous nous concentrons sur les nappes phréatiques. Le problème assez visible est que moins de la moitié des pays semblent renseigner 'encore moins que pour les eaux de surface) cependant moins de valeurs semblent manquantes en tout cas pour l'année 2020.
-
+Les données des eaux souterainne pour les années 2017 et 2020 ont été extraites de GEMS (Global Environment Monitoring Systems) et correspondent à l'indicateur 6.3.2 des ODD.
+(1)Pour les années sans valeur, nous utilisons la valeur de l'année précédente la plus proche si cela est possible, ou la valeur de l'année la plus proche si cela n'est pas possible.
 #### **coastal water bodies in good chemical status**
 ```{r echo=T}
 #pas fait
@@ -240,13 +479,18 @@ Les données ont été récupérés sur GEMS (Global Environment Monitoring Syst
 ##################################################################################################################################################################
 ### Troisième topic: Life support
 
-#### **terrestial habitat in favourable conservation status**
+#### **Percentage of terrestrial habitats in favourable conservation status.**
 Correspond aux valeurs du Biodiversity index intacness (BII) par pays
+
 ```{r echo=T}
 ter_conv<-read.csv("BII_value.csv",sep=";")
+
+correspondances <- match(ter_conv$Country, Countries$BII)
+ter_conv$Country<-Countries$Name[correspondances]
+ter_conv <- ter_conv[complete.cases(ter_conv$Country), ]
 ter_conv<-as.data.frame(apply(ter_conv, 2, as.character))
 ```
-Le tableau de données a été fait à la main en réupérant les valeurs de l'outil d’appréciation des risques biodiversité dans les pays d’intervention de l’AFD produit par Biotope en 2023. Les données sources permettant d'utiliser cette outil proviennent donc du Natural History Museum
+Le tableau de données a été réalisé à la main, à partir des valeurs de l'outil d'évaluation des risques pour la biodiversité dans les pays d'intervention de l'AFD, réalisé par Biotope en 2023. Les données sources de cet outil proviennent du Muséum d'histoire naturelle.
 
 
 #### **freshwater habitat in favourable conservation status**
@@ -256,7 +500,7 @@ Le tableau de données a été fait à la main en réupérant les valeurs de l'o
 ```
 
 
-#### **coastal habitat in favourable conservation status**
+#### **Percentage of coastal water bodies in good ecological status**
 Correspond aux données de l'indicateur de l'Ocean Health Index(OHI) sur la biodiversité 
 ```{r echo=T}
 Cobio<-read.csv("coast_bio.csv",sep = ",")%>%
@@ -264,9 +508,13 @@ Cobio<-read.csv("coast_bio.csv",sep = ",")%>%
   filter(long_goal=="Biodiversity" & dimension=="score")%>%
   select(5,9:14)
 colnames(Cobio)=c("Country","X2015","X2016","X2017","X2018","X2019","X2020")
+
+correspondances <- match(Cobio$Country, Countries$Coast_bio)
+Cobio$Country<-Countries$Name[correspondances]
+Cobio<- Cobio[complete.cases(Cobio$Country), ]
 Cobio<-as.data.frame(apply(Cobio, 2, as.character))
 ```
-Les données ont été récupéré sur le site de l'OHI. Nous suivons donc le modèle proposé par celui-ci sur la biodiversité comprenant deux indicateurs celui de l'état de l'habitat et celui de l'état des espèces.Le premier compare l'état de l'habitat par rapport à un état d'une année passé considéré comme l'état original du milieu. Le deuxième compare le nombre d'espèce en danger d'extinction par rapport aux nombres d'espèces se trouvant dans le milieu.
+Les données ont été extraites du site web de l'OHI. La première compare l'état de l'habitat à celui d'une année précédente, considéré comme l'état originel de l'environnement. La seconde compare le nombre d'espèces en danger d'extinction au nombre d'espèces présentes dans l'environnement.
 
 ##################################################################################################################################################################
 ### Quatrième topic : Human health and welfare
@@ -274,15 +522,23 @@ Les données ont été récupéré sur le site de l'OHI. Nous suivons donc le mo
 #### **outdoor Population exposed to PM.25**
 quantité de pm2.5 dans le pays en μg/m3
 ```{r echo=F}
-PM2<-read.csv("PM2.5Co.csv")
+PM2<-read.csv("PM2.5.csv",sep=";")
+
 PM2<-PM2%>%select(Indicator,Location,Period,FactValueNumeric)%>%
-  pivot_wider(names_from = Period, values_from = FactValueNumeric)%>%   #permet de tranformer le tablaeu avec les années en colonnes
+  pivot_wider(names_from = Period, values_from = FactValueNumeric)%>%
   select(1:7)
 colnames(PM2)=c("Variable","Country","X2019","X2018","X2017","X2016","X2015")
+#1
+PM2<-PM2%>%
+  mutate(X2020=X2019)
+#
+correspondances <- match(PM2$Country, Countries$PM2.5)
+PM2$Country<-Countries$Name[correspondances]
+PM2<- PM2[complete.cases(PM2$Country), ]
 PM2<-as.data.frame(apply(PM2, 2, as.character))
 ```
 Le jeu de donnée provient du WHO et correspond au SDG 11.6.2. Le proxy bas correspond à 5μg/m3 et le haut standard correspond à 25μg/m3
-
+(1)Pour 2020, année sans valeur, nous utilisons la valeur de l'année 2019
 #### **population using clean fuels and technologies for cooking**
 ```{r echo=T}
 #pas fait
@@ -291,19 +547,24 @@ Le jeu de donnée provient du WHO et correspond au SDG 11.6.2. Le proxy bas corr
 #### **Drink water contaminations**
 Escherichia coli contamination of drinking water
 ```{r echo=T}
-Wash<-read.csv("washdashCo.csv", sep= ";")
+Wash<-read.csv("washdash.csv", sep= ";")
 Wash<-Wash%>%group_by(Country,Service.Type,Year,Coverage)%>%
+  #1
   filter(Safely.managed.element=="Free from contamination")%>%
-  #pour seulement garder les datas sur la contamination
+  #
   select(Country,Service.Type,Year,Coverage)%>%
   ungroup()%>%
   pivot_wider(names_from = Year, values_from = Coverage)%>%
   select(1:2,8:13)
-Wash<-as.data.frame(apply(Wash, 2, as.character))
-colnames(Wash)=c("Country","Variable","X2015","X2016","X2017","X2018","X2019","X2020")
-```
-Le jeu de donnée correspond à l'indicateur 6.1.1 récupéré sur washdata (Analyse by safely managed criteria)
 
+colnames(Wash)=c("Country","Variable","X2015","X2016","X2017","X2018","X2019","X2020")
+correspondances <- match(Wash$Country, Countries$Drinking)
+Wash$Country<-Countries$Name[correspondances]
+Wash<- Wash[complete.cases(Wash$Country), ]
+Wash<-as.data.frame(apply(Wash, 2, as.character))
+```
+Le jeu de donnée correspond à l'indicateur 6.1.1 récupéré sur washdata (Analyse by safely managed criteria).
+(1)Nous gardons seulement les données en % correspondant à une eau "Free from contamination" qui correspond à notre indicateur sans contamination par Escherichia coli (E.coli) dans tout échantillon de 100 ml.
 #### **Recreational water bodies in excellent status**
 ```{r echo=T}
 #pas fait
@@ -318,21 +579,33 @@ Le jeu de donnée correspond à l'indicateur 6.1.1 récupéré sur washdata (Ana
 
 L'IUCN divise l'état des sites naturelles de bon état à mauvais état (0 à 3)
 ```{r echo=T}
-Worldher<-read.csv("WorldheriCo.csv",sep = ";")
+Worldher<-read.csv("Worldheri.csv",sep = ";")
+
 Worldher<-Worldher%>%
   group_by(Country)%>%
-  summarise(#transformation pour mettre sous la forme d'un pourcentage
-    #le bon état correspond à 0 et le mauvais à 3, 
-    #ce qui fait que plus le résultat est proche de 100 plus son état est mauvais
-    #C'est asssez contre intuitif d'ou la présence du "1-" dans le calcul pour inverser la valeur
-    X2014=mean((1-X2014/3)*100,na.rm=TRUE),
-    X2017=mean((1-X2017/3)*100,na.rm=TRUE),
-    X2020=mean((1-X2020/3)*100,na.rm=TRUE))%>% 
+  #1
+  summarise(X2014=mean((1-X2014/4)*100,na.rm=TRUE),
+            X2017=mean((1-X2017/4)*100,na.rm=TRUE),
+            X2020=mean((1-X2020/4)*100,na.rm=TRUE))%>% 
+  #
+  #2
   rename("X2015"=X2014)%>%
+  mutate(X2016=X2015,
+         X2018=X2017,
+         X2019=X2017)
+  #
   ungroup
+
+correspondances <- match(Worldher$Country, Countries$Heritage)
+Worldher$Country<-Countries$Name[correspondances]
+Worldher<- Worldher[complete.cases(Worldher$Country), ]
 Worldher<-as.data.frame(apply(Worldher, 2, as.character))
 ```
-Le jeu de donnée a du être fait à la main et est tiré des documents Heritage Outlook 2014, 2017 et 2020. la valeur obtenue pour un pays correspond à la moyenne des états écologiques de tout les sites Unesco du pays sur 3 (la mois bonne valeur accordé par l'IUCN).
+Le jeu de donnée a du être fait à la main et est tiré des documents Heritage Outlook 2014, 2017 et 2020. les données correspondent à l'état du site et varie entre 1 et 4. 1 étant le bon état et 4 le mauvais.
+(1)Nous passons tout d'abord toutes nos valeurs en pourcentage puis nous moyennons les valeurs des sites pour chaque pays afin d'obtenir une valeur unique. Etant donné que 1 est le bon état, il est necessaire de prendre l'inverse du résultat calculé
+(2)Etant donné que nous n'avons pas de valeurs pour toutes les années nous prenons les valeurs de l'année précèdente renseigné la plus proche.
+
+
 
 ## étape 3 : obtenir un tableau regroupant tous les indicateurs par pays et global (avant normalisation)
 
@@ -366,7 +639,7 @@ country_table<-function(name){
   Gwt<-groundwat%>%
     filter(Country==name)%>%
     mutate(Function="Source",
-           Variable="Ground water bodies conditions",
+           Variable="Groundwater stress",
            proxy="25",
            unit="%")
   
@@ -395,6 +668,7 @@ country_table<-function(name){
   Schem<-SW_chem%>%
     filter(Country==name)%>%
     mutate(Function="Sink",
+           Variable="Proportion of surface water bodies in good chemical status",
            proxy="100",
            unit="%")
   
@@ -453,8 +727,8 @@ country_table<-function(name){
 }
 
 #Exemple pour la France
-country_table("France")
-test_indic<-read.csv("Country/France.csv")
+country_table("Italy")
+test_indic<-read.csv("Country/Italy.csv")
 
 test_indic
 ```
@@ -465,13 +739,13 @@ Le tableau regroupe tous les indicateurs pour lesquels nous avons trouvés des d
 all_indic<-function(Countries){
   #code pour obtenir un tableau pour chaque pays comme précèdent
   for (i in 1:nrow(Countries)){#Countries est un tableau regroupant le nom de tout les pays du monde et sert de base pour regrouper les données 
-    n<-Countries[i,4] #le nom correspond à la 4ème colonne du tableau
+    n<-Countries[i,1] #le nom correspond à la 4ème colonne du tableau
     country_table(n) #utilise la fonction pour obtenir un tableau avec n qui correspond au nom d'un pays 
   }
   #code pour obtenir un tableau regroupant tout les pays
-  all_countries<-read.csv(paste0("Country/",Countries[1,4],".csv"))
+  all_countries<-read.csv(paste0("Country/",Countries[1,1],".csv"))
   for (i in 2:nrow(Countries)){
-    n<-Countries[i,4]
+    n<-Countries[i,1]
     y<-read.csv(paste0("Country/",n,".csv"))
     all_countries<-rbind(all_countries,y)#rassemble tout les tableaux de pays en un
   }
@@ -479,9 +753,6 @@ all_indic<-function(Countries){
 }
 
 
-
-
-Countries<-read.csv("CountriesCo.csv", sep=";") #tableau contenant le nom de tout les pays
 
 #obtention d'un tableau contenant tout les pays et d'un tableau par pays (existant dans le tableau Countries)
 all_indic(Countries)
@@ -510,11 +781,9 @@ normall<-function(name)
   #forest
   if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="Forest reccources"){
    for (i in 5:9){
-          x<-as.numeric(Pays[n,i],na.rm=TRUE)
-      y<-as.numeric(Pays[n,i-1],na.rm=TRUE)
-      table[n,i]<-ifelse(x/y*100>100,100,normhab(x/y*100,0,100))
+         x<-as.numeric(Pays[n,i],na.rm=TRUE)
+      table[n,i]<-normhab(x,0,100)
     }
-    table[n,4]<-NA
     n<-n+1
   }
   
@@ -568,13 +837,13 @@ normall<-function(name)
   
   #HCFC
   if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="Consumption of HCFC in ODP per capita"){
-    control<-read.csv("Control_limHCFC.csv",sep=";")%>%
+    control2<-control%>%
       filter(Country==name)
     for (i in 4:9){
       x<-as.numeric(Pays[n,i],na.rm=TRUE)
-      prox<-ifelse(as.numeric(Pays$proxy[n])>control[i-2],5,as.numeric(Pays$proxy[n]))
-      y<-control[i-2]
-      x<-((x-control[i-2])/(prox-control[i-2]))*100
+      prox<-ifelse(as.numeric(Pays$proxy[n])>control2[i-2],5,as.numeric(Pays$proxy[n]))
+      y<-as.numeric(control2[i-2])
+      x<-((x-y)/(prox-y))*100
       table[n,i]<-ifelse(x<0.1,5,ifelse(x>100,100,normhab(x,0,100)))
     
       }
@@ -604,7 +873,9 @@ normall<-function(name)
       if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="Terrestrial habitats in favourable conservation status"){
     for (i in 4:9){
       x<-as.numeric(Pays[n,i],na.rm=TRUE)
-      table[n,i]<-ifelse(x*100>=90,100,normhab(x*100,0,90))
+      table[n,i]<-ifelse(x*100>=90,100,
+                         ifelse(x*100<=30,5,
+                                normhab(x*100,30,90)))
     }
     n<-n+1
       }
@@ -676,15 +947,16 @@ tableau regroupant les données normaliser et la valeur du SESI pour chaque ann�
 all_norm<-function(Countries){
   #code pour obtenir un tableau pour chaque pays comme précèdent
   for (i in 1:nrow(Countries)){
-    n<-Countries[i,4]
+    n<-Countries[i,1]
     normall(n)
+    print(n)
   }
   
   
   #code pour obtenir un tableau regroupant tout les pays
-  all_normcountries<-read.csv(paste0("Country_normSESI/",Countries[1,4],".csv"))
+  all_normcountries<-read.csv(paste0("Country_normSESI/",Countries[1,1],".csv"))
   for (i in 2:nrow(Countries)){
-    n<-Countries[i,4]
+    n<-Countries[i,1]
     y<-read.csv(paste0("Country_normSESI/",n,".csv"))
     all_normcountries<-full_join(all_normcountries,y)
   }
