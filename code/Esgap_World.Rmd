@@ -20,6 +20,7 @@ library(dplyr)
 library(tidyr)
 library(stringr)
 library(ggplot2)
+library(kableExtra)
 ```
 
 ################################################################################################################################################################
@@ -797,9 +798,9 @@ country_table<-function(name){
   Wher<-Worldher%>%
     filter(Country==name)%>%
     mutate(Function="Human health and welfare",
-           Indicator="state of World heritage sites",
+           Indicator="status of world heritage sites",
            ideal_state="100",
-           unit="% Good state (2015<-value of 2014)")
+           unit="% Good status")
 
   Capnt=bind_rows(Tr,Fs,Ws,Gwt,Soil,ghg,hcfc,Schem,Gchem,BII,Cobi,pm,Drink,Wher)
   #2  
@@ -817,7 +818,9 @@ This function groups together all the indicators for which we have data for a co
 ```{r warning=FALSE,message=FALSE}
 country_table("Brazil")
 test_indic<-read.csv("Country/Brazil.csv")
-test_indic
+kable(test_indic) %>%
+  kable_styling() %>%
+  scroll_box(width = "100%", height = "400px")
 ```
 We have chosen Brazil as our country because all the indicators are complete.
 
@@ -859,7 +862,7 @@ all<-read.csv("Country/all_countries.csv")
 ##step 4: normalize data and calculate SESI
 
 ###function to normalize and calculate SESi by country
-```{r warning=FALSE,message=FALSE}
+```{r warning=FALSE,message=FALSE,results='hide'}
 #1
 normhab<-function(value,gpmin,gpmax){5+(gpmax-5)*((value-gpmin)/(gpmax-gpmin))}
 #
@@ -871,11 +874,10 @@ normall<-function(name)
   n<-1
       
   ###NORMALISER###
-  
   ##Source Function
   #forest
-  if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="Forest reccources"){
-   for (i in 4:9){
+  if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="state of forest reccources"){
+   for (i in 3:8){
          x<-as.numeric(Pays[n,i],na.rm=TRUE)
       table[n,i]<-normhab(x,0,100)
     }
@@ -883,8 +885,8 @@ normall<-function(name)
   }
   
   #fish :
-  if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="Proportion of fish stocks not overexploited"){ 
-    for (i in 4:9){
+  if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="Proportion of fish stocks not overexploited"){ 
+    for (i in 3:8){
       x<-as.numeric(Pays[n,i],na.rm=TRUE)
       table[n,i]<-normhab(x,0,100)
     }
@@ -892,8 +894,8 @@ normall<-function(name)
   }
   
   #water stress:
-  if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="Surface water Stress"){ 
-    for (i in 4:9){
+  if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="Surfacewater Stress"){ 
+    for (i in 3:8){
       x<-as.numeric(Pays[n,i],na.rm=TRUE)
       table[n,i]<-ifelse(!is.na(x) & x<=25,100,ifelse(!is.na(x) & x>=100,5,abs(normhab(x,25,100))))
     }
@@ -902,8 +904,8 @@ normall<-function(name)
   #
   
   #Groundwater
-  if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="Groundwater stress"){ 
-    for (i in 4:9){
+  if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="Groundwater stress"){ 
+    for (i in 3:8){
       x<-as.numeric(Pays[n,i],na.rm=TRUE)
       table[n,i]<-ifelse(!is.na(x) & x>=100,5,ifelse(!is.na(x) & x<=25,100,abs(normhab(x,25,100))))
     }
@@ -912,8 +914,8 @@ normall<-function(name)
   
   #Erosion
 
-  if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="area with tolerable erosion"){ 
-    for (i in 4:9){
+  if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="area with tolerable erosion"){ 
+    for (i in 3:8){
       x<-as.numeric(Pays[n,i],na.rm=TRUE)
       table[n,i]<-ifelse(x<2,100,
                     ifelse(x>10,5,normhab(((x-10)/(2-10))*100,0,100)))
@@ -923,8 +925,8 @@ normall<-function(name)
   
   ##Sink function
   #GHG
-    if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="CO2 emissions [tonnes per capita]"){ 
-    for (i in 4:9){
+    if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="CO2 emissions [tonnes per capita]"){ 
+    for (i in 3:8){
       x<-as.numeric(Pays[n,i],na.rm=TRUE)
       table[n,i]<-ifelse(x<2,100,ifelse(x>6,5,normhab((1-(x-2)/(6-2))*100,0,100)))
       }
@@ -932,13 +934,13 @@ normall<-function(name)
     }
   
   #HCFC
-  if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="Consumption of HCFC in ODP per capita"){
+  if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="Consumption of HCFC in ODP per capita"){
     control2<-control%>%
       filter(Country==name)
-    for (i in 4:9){
+    for (i in 3:8){
       x<-as.numeric(Pays[n,i],na.rm=TRUE) 
-      y<-as.numeric(control2[i-2])
-      prox<-ifelse(as.numeric(Pays$proxy[n])>y,5,as.numeric(Pays$proxy[n]))
+      y<-as.numeric(control2[i-1])
+      prox<-ifelse(as.numeric(Pays$ideal_state[n])>y,0,as.numeric(Pays$ideal_state[n]))
       x<-((x-y)/(prox-y))*100
       table[n,i]<-ifelse(x<0.1,5,ifelse(x>100,100,normhab(x,0,100)))
     
@@ -948,8 +950,8 @@ normall<-function(name)
   #
   
   #surface water in good chemical status :
-  if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="Proportion of surface water bodies in good chemical status"){ 
-    for (i in 4:9){
+  if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="Proportion of surface water in good chemical status"){ 
+    for (i in 3:8){
       x<-as.numeric(Pays[n,i],na.rm=TRUE)
       table[n,i]<-normhab(x,0,100)
     }
@@ -957,8 +959,8 @@ normall<-function(name)
   }
    
   #groundwater in good chemical status :
-  if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="Proportion of ground water bodies in good chemical status"){ 
-    for (i in 4:9){
+  if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="Proportion of ground water in good chemical status"){ 
+    for (i in 3:8){
       x<-as.numeric(Pays[n,i],na.rm=TRUE)
       table[n,i]<-normhab(x,0,100)
     }
@@ -967,8 +969,8 @@ normall<-function(name)
   
   ##life support function
   #Biodiv Terrestrial
-      if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="Terrestrial habitats in favourable conservation status"){
-    for (i in 4:9){
+      if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="Terrestrial habitats in favourable conservation status"){
+    for (i in 3:8){
       x<-as.numeric(Pays[n,i],na.rm=TRUE)
       table[n,i]<-ifelse(x>=90,100,
                          ifelse(x<=30,5,
@@ -978,8 +980,8 @@ normall<-function(name)
       }
   ##life support function
   #Biodiv Aquatic
-    if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="Aquatic habitats in favourable conservation status"){ 
-    for (i in 4:9){
+    if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="Aquatic habitats in favourable conservation status"){ 
+    for (i in 3:8){
       x<-as.numeric(Pays[n,i],na.rm=TRUE)
       table[n,i]<-normhab(x,0,100)
     }
@@ -988,8 +990,8 @@ normall<-function(name)
   
   ##human Health function
   #Pm2.5
-  if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="Concentrations of PM2.5"){ 
-    for (i in 4:9){
+  if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="Concentrations of PM2.5"){ 
+    for (i in 3:8){
       x<-as.numeric(Pays[n,i],na.rm=TRUE)
       x<-(x-5)/(35-5)*100
       table[n,i]<-ifelse(x<0,5,normhab(x,0,100))
@@ -998,8 +1000,8 @@ normall<-function(name)
   }
   
   #drinking water
-  if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="Drinking water"){
-    for (i in 4:9){
+  if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="Drinking water contamination"){
+    for (i in 3:8){
       x<-as.numeric(Pays[n,i],na.rm=TRUE)
       table[n,i]<-normhab(x,0,100)
     }
@@ -1007,8 +1009,8 @@ normall<-function(name)
   }
 
   #World Heritage:
-  if (!is.na(Pays$Variable[n]) & Pays$Variable[n]=="World heritage"){
-    for (i in 4:9){
+  if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="status of world heritage sites"){
+    for (i in 3:8){
       x<-as.numeric(Pays[n,i],na.rm=TRUE)
       x<-normhab(x,0,100)
       table[n,i]<-x
@@ -1020,11 +1022,11 @@ normall<-function(name)
     select(2:10)
   #
   SESI<-NULL
-  for (i in 3:8){
+  for (i in 2:7){
     SESI<-c(SESI,prod(as.numeric(table[c(1:nrow(Pays)),i]),na.rm=TRUE)^(1/sum(!is.na(as.numeric(table[c(1:nrow(Pays)),i])))))
     
   }
-  SESI<-c(name,"SESI",SESI,n)
+  SESI<-c(name,SESI,n-1,"SESI")
   #
   table<-rbind(table,SESI)
   write.csv(table,paste0("Country_normSESI/",name,".csv"))
@@ -1041,22 +1043,23 @@ The table is saved in the Country_normSESI folder.
 (2)We calculate the SESI, which corresponds to the geometric mean of all indicators for a given year.
 
 ##Table example
-```{r warning=FALSE,message=FALSE}
+```{r echo=FALSE,warning=FALSE,message=FALSE}
 normall("Brazil")
 test_norm<-read.csv("Country_normSESI/Brazil.csv")
-test_norm
+kable(test_norm) %>%
+  kable_styling() %>%
+  scroll_box(width = "100%", height = "400px")
 ```
 
 
 ##Table of all normalize countries
 Table containing all the standardized data and SESI calculations for which we have found data for each country. A table is saved for each country in doc Country_normSESI
-```{r warning=FALSE,message=FALSE}
+```{r warning=FALSE,message=FALSE,results='hide'}
 all_norm<-function(Countries){
   #to obtain a table for each country
   for (i in 1:nrow(Countries)){
     n<-Countries[i,1]
     normall(n)
-    print(n)
   }
   #to obtain a table of all countries
   all_normcountries<-read.csv(paste0("Country_normSESI/",Countries[1,1],".csv"))
@@ -1064,14 +1067,13 @@ all_norm<-function(Countries){
     n<-Countries[i,1]
     y<-read.csv(paste0("Country_normSESI/",n,".csv"))
     all_normcountries<-full_join(all_normcountries,y)
+    print(n)
   }
   write.csv(all_normcountries,paste0("Country_normSESI/","all_normcountries",".csv"))
 }
 all_norm(Countries)
 
 all_norm<-read.csv("Country_normSESI/all_normcountries.csv")
+all_norm
 ```
 This part is a function similar to the one above for obtaining the table grouping all data by country and by indicator. The table is saved in the Country_normSESI folder.
-
-
-
