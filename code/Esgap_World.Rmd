@@ -45,148 +45,38 @@ Principle	: Renew renewable resources
 Topic :	Biomass
 ```{r warning=FALSE,message=FALSE}
 Tree<-read.csv("tree_coverage.csv",sep=";")%>%
-    select(Country,Variable,c(4:9))
+    select(Country,c(4:9))
 
 #These lines are used to standardize country names.
 correspondances <- match(Tree$Country, Countries$Tree)
 Tree$Country<-Countries$Name[correspondances]
 Tree <- Tree[complete.cases(Tree$Country), ]
 #
+Forest<-read.csv("forest_cover.csv",sep=";")%>%
+  select(1,36)%>%
+    mutate(X1991=X1991*0.1)
+colnames(Forest)[1:2]=c("Country","X1991")
 
-Biome<-read.csv("Biome_foret.csv",sep=";")%>%
-  group_by(Country,layer_id)%>%
-  filter(layer_id=="Boreal" | layer_id=="Temperate" | layer_id=="Tropical")%>%
-  summarize(area=sum(area))%>%
-  ungroup(Country,layer_id)
-
-correspondances <- match(Biome$Country, Countries$Biome)
-Biome$Country<-Countries$Name[correspondances]
-Biome <- Biome[complete.cases(Biome$Country), ]
-
+correspondances <- match(Forest$Country, Countries$Forest)
+Forest$Country<-Countries$Name[correspondances]
+Forest <- Forest[complete.cases(Forest$Country), ]
 #1
-Biome<-full_join(Biome,Biome%>%
+Tree<-full_join(Tree,Forest)%>%
   group_by(Country)%>%
-  summarize(area_tot=sum(area)))%>%
-  mutate(area_per=(area/area_tot))
-
-Tree<-full_join(Tree,Biome)%>%
-  mutate(area_2015=as.numeric(X2015)*area_per,
-         area_2016=as.numeric(X2016)*area_per,
-         area_2017=as.numeric(X2017)*area_per,
-         area_2018=as.numeric(X2018)*area_per,
-         area_2019=as.numeric(X2019)*area_per,
-         area_2020=as.numeric(X2020)*area_per)
-#
-
-
-#2
-Tree<-Tree%>%
-  group_by(Country,layer_id)%>%
-  summarize(X2015=area_2015/area*100,
-            X2016=area_2016/area*100,
-            X2017=area_2017/area*100,
-            X2018=area_2018/area*100,
-            X2019=area_2019/area*100,
-            X2020=area_2020/area*100)%>% 
-  mutate(X2015=ifelse(layer_id=="Boreal",
-                ifelse(X2015<60,0,
-                    ifelse(X2015>85,100,
-                           (X2015-85)/(60-85))),
-               ifelse(layer_id=="Temperate",
-                ifelse(X2015<30,0,
-                    ifelse(X2015>50,100,
-                           (X2015-50)/(30-50))),        
-               ifelse(layer_id=="Tropical",
-                ifelse(X2015<60,0,
-                    ifelse(X2015>85,100,
-                           (X2015-85)/(60-85))),NA))))%>%
-  
-   mutate(X2016=ifelse(layer_id=="Boreal",
-                ifelse(X2016<60,0,
-                    ifelse(X2016>85,100,
-                           (X2016-85)/(60-85))),
-               ifelse(layer_id=="Temperate",
-                ifelse(X2016<30,0,
-                    ifelse(X2016>50,100,
-                           (X2016-50)/(30-50))),        
-               ifelse(layer_id=="Tropical",
-                ifelse(X2016<60,0,
-                    ifelse(X2016>85,100,
-                           (X2016-85)/(60-85))),NA))))%>%
-  
-   mutate(X2017=ifelse(layer_id=="Boreal",
-                ifelse(X2017<60,0,
-                    ifelse(X2017>85,100,
-                           (X2017-85)/(60-85))),
-               ifelse(layer_id=="Temperate",
-                ifelse(X2017<30,0,
-                    ifelse(X2017>50,100,
-                           (X2017-50)/(30-50))),        
-               ifelse(layer_id=="Tropical",
-                ifelse(X2017<60,0,
-                    ifelse(X2017>85,100,
-                           (X2017-85)/(60-85))),NA))))%>%
-  
-   mutate(X2018=ifelse(layer_id=="Boreal",
-                ifelse(X2018<60,0,
-                    ifelse(X2018>85,100,
-                           (X2018-85)/(60-85))),
-               ifelse(layer_id=="Temperate",
-                ifelse(X2018<30,0,
-                    ifelse(X2018>50,100,
-                           (X2018-50)/(30-50))),        
-               ifelse(layer_id=="Tropical",
-                ifelse(X2018<60,0,
-                    ifelse(X2018>85,100,
-                           (X2018-85)/(60-85))),NA))))%>%
-  
-   mutate(X2019=ifelse(layer_id=="Boreal",
-                ifelse(X2019<60,0,
-                    ifelse(X2019>85,100,
-                           (X2019-85)/(60-85))),
-               ifelse(layer_id=="Temperate",
-                ifelse(X2019<30,0,
-                    ifelse(X2019>50,100,
-                           (X2019-50)/(30-50))),        
-               ifelse(layer_id=="Tropical",
-                ifelse(X2019<60,0,
-                    ifelse(X2019>85,100,
-                           (X2019-85)/(60-85))),NA))))%>%
-  
-   mutate(X2020=ifelse(layer_id=="Boreal",
-                ifelse(X2020<60,0,
-                    ifelse(X2020>85,100,
-                           (X2020-85)/(60-85))),
-               ifelse(layer_id=="Temperate",
-                ifelse(X2020<30,0,
-                    ifelse(X2020>50,100,
-                           (X2020-50)/(30-50))),        
-               ifelse(layer_id=="Tropical",
-                ifelse(X2020<60,0,
-                    ifelse(X2020>85,100,
-                           (X2020-85)/(60-85))),NA))))%>%
-  ungroup()
-  
-  Tree<-Tree%>%
-    group_by(Country)%>%
-    summarise(X2015=mean(X2015,na.rm=TRUE),
-              X2016=mean(X2016,na.rm=TRUE),
-              X2017=mean(X2017,na.rm=TRUE),
-              X2018=mean(X2018,na.rm=TRUE),
-              X2019=mean(X2019,na.rm=TRUE),
-              X2020=mean(X2020,na.rm=TRUE))
+  summarize(X2015=X2015/X1991*100,
+            X2016=X2016/X1991*100,
+            X2017=X2017/X1991*100,
+            X2018=X2018/X1991*100,
+            X2019=X2019/X1991*100,
+            X2020=X2020/X1991*100)
 #
 Tree<-as.data.frame(apply(Tree, 2, as.character))
 
 ```
+The "Tree" table corresponds to FAO data on forest cover for each country for the years 2015 to 2020, and the forest table corresponds to the World bank forest cover for 1991. Tree data sets is expressed in square kilometers (km2) and forest cover in ha.
 
-!! Not Working !!
+(1)Our objective is to obtain the percentage of forest cover in comparison to cover forest of 1991. 
 
-The "Tree" table corresponds to FAO data on forest cover for each country for the years 2015 to 2020, and the "Biome" table corresponds to Global Ecosystem Typology (GET) data on functional forest cover. Both data sets are expressed in square kilometers (km2).
-
-(1)Our objective is to obtain the percentage of forest cover in relation to the cover of functional forest biomes. Initially, we had data on total forest cover in km2 without biome differentiation for the years 2015-2020, and on functional biome cover in km2. To achieve our objective, we need to determine the forest cover of the different functional biomes for each year. To do this, we will apply the percentage of each biome from the GET table to the annual forest cover data, giving us the forest cover of each specific biome by year.
-
-(2)With these new values, we can now compare the difference in forest cover between the functional biomes and the forest cover for the selected years.
 
 #### **Fish resources** 
 Indicator no.	02
@@ -299,9 +189,9 @@ freshwat<-read.csv("Fresh_groundwater.csv",sep = ";")%>%
             Y2020=sum(X2020,na.rm= TRUE))
   #
 
-correspondances <- match(prodwat$Country, Countries$inflow_GW)
-prodwat$Country<-Countries$Name[correspondances]
-prodwat <- prodwat[complete.cases(prodwat$Country), ]
+correspondances <- match(freshwat$Country, Countries$freshwat_GW)
+freshwat$Country<-Countries$Name[correspondances]
+freshwat <- freshwat[complete.cases(freshwat$Country), ]
 
 groundwat<-full_join(prodwat,freshwat)%>%
   group_by(Country)%>%
@@ -879,7 +769,7 @@ normall<-function(name)
   if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="state of forest reccources"){
    for (i in 3:8){
          x<-as.numeric(Pays[n,i],na.rm=TRUE)
-      table[n,i]<-normhab(x,0,100)
+      table[n,i]<-ifelse(x>100,100,normhab(x,0,100))
     }
     n<-n+1
   }
@@ -940,9 +830,9 @@ normall<-function(name)
     for (i in 3:8){
       x<-as.numeric(Pays[n,i],na.rm=TRUE) 
       y<-as.numeric(control2[i-1])
-      prox<-ifelse(as.numeric(Pays$ideal_state[n])>y,0,as.numeric(Pays$ideal_state[n]))
+      prox<-ifelse(as.numeric(Pays$ideal_state[n])>y,-0.1,as.numeric(Pays$ideal_state[n]))
       x<-((x-y)/(prox-y))*100
-      table[n,i]<-ifelse(x<0.1,5,ifelse(x>100,100,normhab(x,0,100)))
+      table[n,i]<-ifelse(x<0,5,ifelse(x>100,100,normhab(x,0,100)))
     
       }
     n<-n+1
@@ -1077,3 +967,4 @@ all_norm<-read.csv("Country_normSESI/all_normcountries.csv")
 all_norm
 ```
 This part is a function similar to the one above for obtaining the table grouping all data by country and by indicator. The table is saved in the Country_normSESI folder.
+
