@@ -44,7 +44,7 @@ Function : Source functions
 Principle	: Renew renewable resources
 Topic :	Biomass
 ```{r warning=FALSE,message=FALSE}
-Tree<-read.csv("tree_coverage.csv",sep=";")%>%
+Tree<-read.csv("tree_coverage.csv",sep=";")
     select(Country,c(4:9))
 
 #These lines are used to standardize country names.
@@ -71,11 +71,10 @@ Tree<-full_join(Tree,Forest)%>%
             X2020=X2020/X1991*100)
 #
 Tree<-as.data.frame(apply(Tree, 2, as.character))
-
 ```
-The "Tree" table corresponds to FAO data on forest cover for each country for the years 2015 to 2020, and the forest table corresponds to the World bank forest cover for 1991. Tree data sets is expressed in square kilometers (km2) and forest cover in ha.
+The "Tree" table corresponds to FAO data on forest cover for each country for the years 2015 to 2020, and the forest table corresponds to the World bank forest cover for 1991.
 
-(1)Our objective is to obtain the percentage of forest cover in comparison to cover forest of 1991. 
+(1)We seek to obtain the percentage of forest cover in comparison with 1991. 
 
 
 #### **Fish resources** 
@@ -769,7 +768,8 @@ normall<-function(name)
   if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="state of forest reccources"){
    for (i in 3:8){
          x<-as.numeric(Pays[n,i],na.rm=TRUE)
-      table[n,i]<-ifelse(x>100,100,normhab(x,0,100))
+      table[n,i]<-ifelse(x>100,100,
+                         ifelse(x<85,5,normhab(x,85,100)))
     }
     n<-n+1
   }
@@ -967,4 +967,5 @@ all_norm<-read.csv("Country_normSESI/all_normcountries.csv")
 all_norm
 ```
 This part is a function similar to the one above for obtaining the table grouping all data by country and by indicator. The table is saved in the Country_normSESI folder.
+
 
