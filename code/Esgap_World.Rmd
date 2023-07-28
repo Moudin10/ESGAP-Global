@@ -44,7 +44,7 @@ Function : Source functions
 Principle	: Renew renewable resources
 Topic :	Biomass
 ```{r warning=FALSE,message=FALSE}
-Tree<-read.csv("tree_coverage.csv",sep=";")
+Tree<-read.csv("tree_coverage.csv",sep=";")%>%
     select(Country,c(4:9))
 
 #These lines are used to standardize country names.
