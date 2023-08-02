@@ -883,7 +883,7 @@ normall<-function(name)
   if (!is.na(Pays$Indicator[n]) & Pays$Indicator[n]=="Concentrations of PM2.5"){ 
     for (i in 3:8){
       x<-as.numeric(Pays[n,i],na.rm=TRUE)
-      x<-(x-5)/(35-5)*100
+      x<-100*(x-35)/(5-35)
       table[n,i]<-ifelse(x<0,5,normhab(x,0,100))
     }
     n<-n+1
@@ -969,3 +969,29 @@ all_norm
 This part is a function similar to the one above for obtaining the table grouping all data by country and by indicator. The table is saved in the Country_normSESI folder.
 
 
+
+```{r warning=FALSE,message=FALSE,results='hide'}
+uneurope<-dataEU$Country[1:28]
+Countries<-uneurope
+all_europe<-function(Countries){
+  #to obtain a table for each country
+  for (i in 1:length(Countries)){
+    n<-Countries[i]
+    normall(n)
+  }
+  #to obtain a table of all countries
+  all_normcountries<-read.csv(paste0("Country_normSESI/",Countries[1],".csv"))
+  for (i in 2:length(Countries)){
+    n<-Countries[i]
+    y<-read.csv(paste0("Country_normSESI/",n,".csv"))
+    all_normcountries<-full_join(all_normcountries,y)
+    print(n)
+  }
+  write.csv(all_normcountries,paste0("Country_normSESI/","Europe_normcountries",".csv"))
+}
+all_europe(uneurope)
+
+all_europe<-read.csv("Country_normSESI/Europe_normcountries.csv")
+all_europe
+```
+This part is a function similar to the one above for obtaining the table grouping all data by country and by indicator. The table is saved in the Country_normSESI folder.
