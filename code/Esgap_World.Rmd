@@ -34,7 +34,7 @@ Countries<-read.csv("Countries.csv",sep=";")
 ```
 The first column corresponds to the names that will be used for the SESI calculation, and each subsequent column corresponds to the names of the countries in the x database.This table will enable us to standardize the country names for each indicator. This will avoid any loss of information when calculating the SESI index.
 
-!! remember to transform the "," in some databases into " !!
+!! remember to transform the "," in some databases into " " !!
 
 ### First topic: Renewable resources
 
@@ -54,13 +54,13 @@ Tree <- Tree[complete.cases(Tree$Country), ]
 #
 Forest<-read.csv("forest_cover.csv",sep=";")%>%
   select(1,36)%>%
-    mutate(X1991=X1991*0.1)
+    mutate(X1991=X1991*0.1)#Unit change
 colnames(Forest)[1:2]=c("Country","X1991")
 
 correspondances <- match(Forest$Country, Countries$Forest)
 Forest$Country<-Countries$Name[correspondances]
 Forest <- Forest[complete.cases(Forest$Country), ]
-#1
+#1 (comment below)
 Tree<-full_join(Tree,Forest)%>%
   group_by(Country)%>%
   summarize(X2015=X2015/X1991*100,
@@ -584,15 +584,23 @@ The dataset had to be made by hand and is taken from the Heritage Outlook docume
 
 ###function to group indicators by country
 ```{r warning=FALSE,message=FALSE}
+Countries<-read.csv("Countries.csv",sep=";")
 country_table<-function(name){
 
   #\Source Function
   #1
+  Continent<-Countries%>%
+    filter(Name==name)%>%
+    select(24)
+    
   Tr<-Tree%>%
     filter(Country==name)%>%
     mutate(Function="Source",
            Subfunction="renewable ressources",
            Indicator="state of forest reccources",
+           Countries%>%
+    filter(Name==name)%>%
+    select(24),
            ideal_state="100",
            unit="%")
   #
@@ -602,6 +610,9 @@ country_table<-function(name){
     mutate(Function="Source",
            Subfunction="renewable ressources",
            Indicator="Proportion of fish stocks not overexploited",
+           Countries%>%
+    filter(Name==name)%>%
+    select(24),
            ideal_state="100",
            unit="% Sus fish stock")
      
@@ -610,6 +621,9 @@ country_table<-function(name){
     mutate(Function="Source",
            Subfunction="renewable ressources",
            Indicator="Surfacewater Stress",
+           Countries%>%
+    filter(Name==name)%>%
+    select(24),
            ideal_state="25",
            unit="% of stress") 
       
@@ -618,6 +632,9 @@ country_table<-function(name){
     mutate(Function="Source",
            Subfunction="renewable ressources",
            Indicator="Groundwater stress",
+           Countries%>%
+    filter(Name==name)%>%
+    select(24),
            ideal_state="25",
            unit="%")
   
@@ -626,6 +643,9 @@ country_table<-function(name){
     mutate(Function="Source",
            Subfunction="non-renewables ressources",
            Indicator="area with tolerable erosion",
+           Countries%>%
+    filter(Name==name)%>%
+    select(24),
            ideal_state="2",
            unit="Tonnes/hectare/year")
    
@@ -635,6 +655,9 @@ country_table<-function(name){
     mutate(Function="Sink",
            Subfunction="global System",
            Indicator="CO2 emissions [tonnes per capita]",
+           Countries%>%
+    filter(Name==name)%>%
+    select(24),
            ideal_state="2.88",
            unit="tonnes per year per capita")
    
@@ -643,6 +666,9 @@ country_table<-function(name){
     mutate(Function="Sink",
            Subfunction="global System",
            Indicator="Consumption of HCFC in ODP per capita",
+           Countries%>%
+    filter(Name==name)%>%
+    select(24),
            unit="0.5% compare to 2007 in CO2-eq tonnes")%>%
            rename("ideal_state"=X2007)
   
@@ -651,6 +677,9 @@ country_table<-function(name){
     mutate(Function="Sink",
            Subfunction="critical ecosystems",
            Indicator="Proportion of surface water in good chemical status",
+           Countries%>%
+    filter(Name==name)%>%
+    select(24),
            ideal_state="100",
            unit="%")
   
@@ -659,6 +688,9 @@ country_table<-function(name){
     mutate(Function="Sink",
            Subfunction="critical ecosystems",
            Indicator="Proportion of ground water in good chemical status",
+           Countries%>%
+    filter(Name==name)%>%
+    select(24),
            ideal_state="100",
            unit="%")
   
@@ -668,6 +700,9 @@ country_table<-function(name){
     mutate(Function="Life support",
            Subfunction="ecosystem health",
            Indicator="Terrestrial habitats in favourable conservation status",
+           Countries%>%
+    filter(Name==name)%>%
+    select(24),
            ideal_state="100",
            unit="%")
   
@@ -678,6 +713,9 @@ country_table<-function(name){
            Subfunction="ecosystem health",
            Indicator="Aquatic habitats in favourable conservation status",
            ideal_state="100",
+           Countries%>%
+    filter(Name==name)%>%
+    select(24),
            unit="%")
   
   #\Human health and welfare function
@@ -686,6 +724,9 @@ country_table<-function(name){
     mutate(Function="Human health and welfare",
            Subfunction="human health",
            Indicator="Concentrations of PM2.5",
+           Countries%>%
+    filter(Name==name)%>%
+    select(24),
            ideal_state="5",
            unit="μg/m3")
   
@@ -695,7 +736,10 @@ country_table<-function(name){
            Subfunction="human health",
            Indicator="Drinking water contamination",
            ideal_state="100",
-           unit="% without E.coli")
+           Countries%>%
+    filter(Name==name)%>%
+    select(24),
+            unit="% without E.coli")
   
   Wher<-Worldher%>%
     filter(Country==name)%>%
@@ -703,6 +747,9 @@ country_table<-function(name){
            Subfunction="landscape and amenity",
            Indicator="status of world heritage sites",
            ideal_state="100",
+           Countries%>%
+    filter(Name==name)%>%
+    select(24),
            unit="% Good status")
 
   Capnt=bind_rows(Tr,Fs,Ws,Gwt,Soil,ghg,hcfc,Schem,Gchem,BII,Cobi,pm,Drink,Wher)
@@ -769,6 +816,7 @@ all<-read.csv("Country/all_countries.csv")
 #1
 normhab<-function(value,gpmin,gpmax){5+(gpmax-5)*((value-gpmin)/(gpmax-gpmin))}
 #
+name<-"Brazil"
 normall<-function(name)
 {
   Pays<-read.csv(paste0("Country/",name,".csv"))
@@ -922,11 +970,13 @@ normall<-function(name)
   }
 
   table<-table%>%
-    select(2:11)
+    select(2:12)
   #
   
   ##SESI##
-  
+    Continent<-Countries%>%
+    filter(Name==name)%>%
+    select(24)
   ##Source
   #subfunction layer
   #renewable ressources
@@ -938,7 +988,7 @@ normall<-function(name)
     renew_res<-c(renew_res,ifelse(y==1,NA,y))
     
   }
-  renew_res<-c(name,renew_res,"Source","renewable ressources","renewable ressources")
+  renew_res<-c(name,renew_res,"Source","renewable ressources","renewable ressources",Continent$Continent)
   table<-rbind(table,renew_res)
   
   #non-renewable ressources
@@ -949,7 +999,7 @@ normall<-function(name)
     y<-prod(as.numeric(non_renew[c(1:nrow(non_renew)),i]),na.rm=TRUE)^(1/sum(!is.na(as.numeric(non_renew[c(1:nrow(non_renew)),i]))))
     non_renew_res<-c(non_renew_res,ifelse(y==1,NA,y))
   }
-  non_renew_res<-c(name,non_renew_res,"Source","non-renewable ressources","non-renewable ressources")
+  non_renew_res<-c(name,non_renew_res,"Source","non-renewable ressources","non-renewable ressources",Continent$Continent)
   table<-rbind(table,non_renew_res)
   Source_res<-rbind(renew_res,non_renew_res)
   #
@@ -962,7 +1012,7 @@ normall<-function(name)
     
   }
   
-  Source<-c(name,Source,"Source","Source","Source")
+  Source<-c(name,Source,"Source","Source","Source",Continent$Continent)
   table<-rbind(table,Source)
   functions<-Source
   
@@ -977,7 +1027,7 @@ normall<-function(name)
     global_sys<-c(global_sys,ifelse(y==1,NA,y))
     
   }
-  global_sys<-c(name,global_sys,"Sink","global System","global System")
+  global_sys<-c(name,global_sys,"Sink","global System","global System",Continent$Continent)
   table<-rbind(table,global_sys)
   
   #critical ecosystems
@@ -988,7 +1038,7 @@ normall<-function(name)
     y<-prod(as.numeric(crit_eco[c(1:nrow(crit_eco)),i]),na.rm=TRUE)^(1/sum(!is.na(as.numeric(crit_eco[c(1:nrow(crit_eco)),i]))))
     crit_ecosys<-c(crit_ecosys,ifelse(y==1,NA,y))
   }
-  crit_ecosys<-c(name,crit_ecosys,"Sink","critical ecosystems","critical ecosystems")
+  crit_ecosys<-c(name,crit_ecosys,"Sink","critical ecosystems","critical ecosystems",Continent$Continent)
   table<-rbind(table,crit_ecosys)
   Sink<-rbind(global_sys,crit_ecosys)
   #
@@ -1001,7 +1051,7 @@ normall<-function(name)
     
   }
   
-  Sink<-c(name,Sink_sys,"Sink","Sink","Sink")
+  Sink<-c(name,Sink_sys,"Sink","Sink","Sink",Continent$Continent)
   table<-rbind(table,Sink)
   functions<-rbind(functions,Sink)
 
@@ -1017,11 +1067,11 @@ normall<-function(name)
     
   }
   life<-ecosys
-  ecosys<-c(name,ecosys,"Life support","ecosystem health","ecosystem health")
+  ecosys<-c(name,ecosys,"Life support","ecosystem health","ecosystem health",Continent$Continent)
 
   table<-rbind(table,ecosys)
   
-  life<-c(name,life,"Life support","Life support","Life support")
+  life<-c(name,life,"Life support","Life support","Life support",Continent$Continent)
   table<-rbind(table,life)
   functions<-rbind(functions,life)
 
@@ -1036,7 +1086,7 @@ normall<-function(name)
     human_he<-c(human_he,ifelse(y==1,NA,y))
     
   }
-  human_he<-c(name,human_he,"Human health and welfare","human health","human health")
+  human_he<-c(name,human_he,"Human health and welfare","human health","human health",Continent$Continent)
   table<-rbind(table,human_he)
   
   #landscape and amenity
@@ -1047,7 +1097,7 @@ normall<-function(name)
     y<-prod(as.numeric(land[c(1:nrow(land)),i]),na.rm=TRUE)^(1/sum(!is.na(as.numeric(land[c(1:nrow(land)),i]))))
     land_ame<-c(land_ame,ifelse(y==1,NA,y))
   }
-  land_ame<-c(name,land_ame,"Human health and welfare","landscape and amenity","landscape and amenitys")
+  land_ame<-c(name,land_ame,"Human health and welfare","landscape and amenity","landscape and amenitys",Continent$Continent)
   table<-rbind(table,land_ame)
   Welfare<-rbind(human_he,land_ame)
   #
@@ -1060,7 +1110,7 @@ normall<-function(name)
     
   }
   
-  Welfare<-c(name,Welfare_sys,"Human health and welfare","Human health and welfare","Human health and welfare")
+  Welfare<-c(name,Welfare_sys,"Human health and welfare","Human health and welfare","Human health and welfare",Continent$Continent)
   table<-rbind(table,Welfare)
   functions<-rbind(functions,Welfare)
   
@@ -1072,7 +1122,7 @@ normall<-function(name)
     
   }
   
-  SESI_layer<-c(name,SESI_layer,n-1,"SESI layer","SESI layer")
+  SESI_layer<-c(name,SESI_layer,n-1,"SESI","SESI",Continent$Continent)
   table<-rbind(table,SESI_layer)
 
   #
@@ -1123,33 +1173,5 @@ all_norm(Countries)
 
 all_norm<-read.csv("Country_normSESI/all_normcountries.csv")
 all_norm
-```
-This part is a function similar to the one above for obtaining the table grouping all data by country and by indicator. The table is saved in the Country_normSESI folder.
-
-
-
-```{r warning=FALSE,message=FALSE,results='hide'}
-dataEU<-read.csv("europe.csv",sep = ";")
-Countries<-unique(dataEU$Country)
-all_europe<-function(Countries){
-  #to obtain a table for each country
-  for (i in 1:length(Countries)){
-    n<-Countries[i]
-    normall(n)
-  }
-  #to obtain a table of all countries
-  all_normcountries<-read.csv(paste0("Country_normSESI/",Countries[1],".csv"))
-  for (i in 2:length(Countries)){
-    n<-Countries[i]
-    y<-read.csv(paste0("Country_normSESI/",n,".csv"))
-    all_normcountries<-full_join(all_normcountries,y)
-    print(n)
-  }
-  write.csv(all_normcountries,paste0("Country_normSESI/","Europe_normcountries",".csv"))
-}
-all_europe(Countries)
-
-all_europe<-read.csv("Country_normSESI/Europe_normcountries.csv")
-all_europe
 ```
 This part is a function similar to the one above for obtaining the table grouping all data by country and by indicator. The table is saved in the Country_normSESI folder.
