@@ -1,0 +1,7 @@
+"","Country","X2015","X2016","X2017","X2018","X2019","X2020","Function","Subfunction","Indicator","Continent","ideal_state","unit"
+"1","New Caledonia","1.008076e+02","1.007956e+02","1.007836e+02","1.007716e+02","1.007596e+02","1.007475e+02","Source","renewable ressources","state of forest reccources","Oceania","100","%"
+"2","New Caledonia","82.61000","82.61000","77.55000","77.55000","77.55000","77.55000","Source","renewable ressources","Proportion of fish stocks not overexploited","Oceania","100","% Sus fish stock"
+"3","New Caledonia","18.3387288","19.3076371","18.3541384","20.2900987","21.1540368","21.7115246","Sink","global System","CO2 emissions [tonnes per capita]","Oceania","2.88","tonnes per year per capita"
+"4","New Caledonia","86.85675","86.89281","86.93152","86.96750","87.00342","87.01550","Life support","ecosystem health","Terrestrial habitats in favourable conservation status","Oceania","100","%"
+"5","New Caledonia","84.98","84.90","84.78","84.66","84.54","84.42","Life support","ecosystem health","Aquatic habitats in favourable conservation status","Oceania","100","%"
+"6","New Caledonia"," 95.50277"," 95.72986"," 95.95695"," 96.18403"," 96.41112"," 96.63820","Human health and welfare","human health","Drinking water contamination","Oceania","100","% without E.coli"

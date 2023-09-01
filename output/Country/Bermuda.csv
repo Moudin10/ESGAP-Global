@@ -1,0 +1,6 @@
+"","Country","X2015","X2016","X2017","X2018","X2019","X2020","Function","Subfunction","Indicator","Continent","ideal_state","unit"
+"1","Bermuda","1.000000e+02","1.000000e+02","1.000000e+02","1.000000e+02","1.000000e+02","1.000000e+02","Source","renewable ressources","state of forest reccources","America","100","%"
+"2","Bermuda","73.91000","73.91000","56.25000","56.25000","56.25000","56.25000","Source","renewable ressources","Proportion of fish stocks not overexploited","America","100","% Sus fish stock"
+"3","Bermuda","14.4537123","17.6179955","13.3324917","14.8974226","14.7068612","12.2025063","Sink","global System","CO2 emissions [tonnes per capita]","America","2.88","tonnes per year per capita"
+"4","Bermuda",NA,NA,NA,NA,NA,NA,"Life support","ecosystem health","Terrestrial habitats in favourable conservation status","America","100","%"
+"5","Bermuda","79.87","79.82","79.67","79.52","79.37","79.22","Life support","ecosystem health","Aquatic habitats in favourable conservation status","America","100","%"

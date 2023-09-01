@@ -1,0 +1,7 @@
+"","Country","X2015","X2016","X2017","X2018","X2019","X2020","Function","Subfunction","Indicator","Continent","ideal_state","unit"
+"1","Tuvalu","1.000000e+02","1.000000e+02","1.000000e+02","1.000000e+02","1.000000e+02","1.000000e+02","Source","renewable ressources","state of forest reccources","Oceania","100","%"
+"2","Tuvalu","82.61000","82.61000","77.55000","77.55000","77.55000","77.55000","Source","renewable ressources","Proportion of fish stocks not overexploited","Oceania","100","% Sus fish stock"
+"3","Tuvalu",NA,NA,NA,NA,NA,NA,"Source","renewable ressources","Groundwater stress","Oceania","25","%"
+"4","Tuvalu","    0.02","    0.01","    0.01","    0.00","    0.00","    0.00","Sink","global System","Consumption of HCFC in ODP per capita","Oceania"," 0.0000","0.5% compare to 2007 in CO2-eq tonnes"
+"5","Tuvalu","86.91","87.53","87.37","87.20","87.03","86.87","Life support","ecosystem health","Aquatic habitats in favourable conservation status","Oceania","100","%"
+"6","Tuvalu"," 6.95"," 6.70"," 6.85"," 6.94"," 6.81"," 6.81","Human health and welfare","human health","Concentrations of PM2.5","Oceania","5","µg/m3"

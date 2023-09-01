@@ -1,0 +1,6 @@
+"","Country","X2015","X2016","X2017","X2018","X2019","X2020","Function","Subfunction","Indicator","Continent","ideal_state","unit"
+"1","Anguilla",NA,NA,NA,NA,NA,NA,"Source","renewable ressources","state of forest reccources","America","100","%"
+"2","Anguilla","60.34000","60.34000","61.40000","61.40000","61.40000","61.40000","Source","renewable ressources","Proportion of fish stocks not overexploited","America","100","% Sus fish stock"
+"3","Anguilla",NA,NA,NA,NA,NA,NA,"Sink","global System","CO2 emissions [tonnes per capita]","America","2.88","tonnes per year per capita"
+"4","Anguilla",NA,NA,NA,NA,NA,NA,"Life support","ecosystem health","Terrestrial habitats in favourable conservation status","America","100","%"
+"5","Anguilla","82.32","81.98","78.35","81.27","81.48","81.70","Life support","ecosystem health","Aquatic habitats in favourable conservation status","America","100","%"

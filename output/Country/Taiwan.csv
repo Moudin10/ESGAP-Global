@@ -1,0 +1,5 @@
+"","Country","X2015","X2016","X2017","X2018","X2019","X2020","Function","Subfunction","Indicator","Continent","ideal_state","unit"
+"1","Taiwan","82.69000","82.69000","65.38000","65.38000","65.38000","65.38000","Source","renewable ressources","Proportion of fish stocks not overexploited","Asia","100","% Sus fish stock"
+"2","Taiwan"," 5.19"," 5.19"," 5.19"," 5.19"," 5.19"," 5.19","Source","non-renewables ressources","area with tolerable erosion","Asia","2","Tonnes/hectare/year"
+"3","Taiwan",NA,NA,NA,NA,NA,NA,"Sink","global System","CO2 emissions [tonnes per capita]","Asia","2.88","tonnes per year per capita"
+"4","Taiwan","78.05","76.05","75.84","75.99","75.95","75.11","Life support","ecosystem health","Aquatic habitats in favourable conservation status","Asia","100","%"

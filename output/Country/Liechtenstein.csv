@@ -1,0 +1,8 @@
+"","Country","X2015","X2016","X2017","X2018","X2019","X2020","Function","Subfunction","Indicator","Continent","ideal_state","unit"
+"1","Liechtenstein","1.027607e+02","1.027607e+02","1.027607e+02","1.027607e+02","1.027607e+02","1.027607e+02","Source","renewable ressources","state of forest reccources","Europe","100","%"
+"2","Liechtenstein"," 2.08"," 2.08"," 2.08"," 2.08"," 2.08"," 2.08","Source","non-renewables ressources","area with tolerable erosion","Europe","2","Tonnes/hectare/year"
+"3","Liechtenstein","    0.00","    0.00","    0.00","    0.00","    0.00","    0.00","Sink","global System","Consumption of HCFC in ODP per capita","Europe"," 0.0000","0.5% compare to 2007 in CO2-eq tonnes"
+"4","Liechtenstein"," 77.80"," 77.80"," 77.80"," 77.80"," 77.80"," 77.80","Sink","critical ecosystems","Proportion of surface water in good chemical status","Europe","100","%"
+"5","Liechtenstein","100.0","100.0","100.0","100.0","100.0","100.0","Sink","critical ecosystems","Proportion of ground water in good chemical status","Europe","100","%"
+"6","Liechtenstein","68.04650","67.82505","67.60655","67.38462","67.02123","66.74785","Life support","ecosystem health","Terrestrial habitats in favourable conservation status","Europe","100","%"
+"7","Liechtenstein","100.00000","100.00000","100.00000","100.00000","100.00000","100.00000","Human health and welfare","human health","Drinking water contamination","Europe","100","% without E.coli"

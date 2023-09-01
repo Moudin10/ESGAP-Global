@@ -1,0 +1,6 @@
+"","Country","X2015","X2016","X2017","X2018","X2019","X2020","Function","Subfunction","Indicator","Continent","ideal_state","unit"
+"1","Aruba","1.000000e+02","1.000000e+02","1.000000e+02","1.000000e+02","1.000000e+02","1.000000e+02","Source","renewable ressources","state of forest reccources","America","100","%"
+"2","Aruba","60.34000","60.34000","61.40000","61.40000","61.40000","61.40000","Source","renewable ressources","Proportion of fish stocks not overexploited","America","100","% Sus fish stock"
+"3","Aruba","15.9633070","15.5989798","13.0035457","13.2466136","13.5668942","11.2357605","Sink","global System","CO2 emissions [tonnes per capita]","America","2.88","tonnes per year per capita"
+"4","Aruba",NA,NA,NA,NA,NA,NA,"Life support","ecosystem health","Terrestrial habitats in favourable conservation status","America","100","%"
+"5","Aruba","83.61","83.44","83.26","83.09","82.92","82.75","Life support","ecosystem health","Aquatic habitats in favourable conservation status","America","100","%"

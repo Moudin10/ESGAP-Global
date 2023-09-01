@@ -1,0 +1,5 @@
+"","Country","X2015","X2016","X2017","X2018","X2019","X2020","Function","Subfunction","Indicator","Continent","ideal_state","unit"
+"1","Western Sahara",NA,NA,NA,NA,NA,NA,"Source","renewable ressources","state of forest reccources","Africa","100","%"
+"2","Western Sahara"," 0.03"," 0.03"," 0.03"," 0.03"," 0.03"," 0.03","Source","non-renewables ressources","area with tolerable erosion","Africa","2","Tonnes/hectare/year"
+"3","Western Sahara",NA,NA,NA,NA,NA,NA,"Sink","global System","CO2 emissions [tonnes per capita]","Africa","2.88","tonnes per year per capita"
+"4","Western Sahara","77.02","76.69","72.57","71.81","71.01","71.70","Life support","ecosystem health","Aquatic habitats in favourable conservation status","Africa","100","%"

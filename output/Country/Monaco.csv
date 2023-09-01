@@ -1,0 +1,8 @@
+"","Country","X2015","X2016","X2017","X2018","X2019","X2020","Function","Subfunction","Indicator","Continent","ideal_state","unit"
+"1","Monaco",NA,NA,NA,NA,NA,NA,"Source","renewable ressources","state of forest reccources","Europe","100","%"
+"2","Monaco","37.84000","37.84000","37.50000","37.50000","37.50000","37.50000","Source","renewable ressources","Proportion of fish stocks not overexploited","Europe","100","% Sus fish stock"
+"3","Monaco"," 3.35"," 3.35"," 3.35"," 3.35"," 3.35"," 3.35","Source","non-renewables ressources","area with tolerable erosion","Europe","2","Tonnes/hectare/year"
+"4","Monaco","    0.00","    0.00","    0.00","    0.00","    0.00","    0.00","Sink","global System","Consumption of HCFC in ODP per capita","Europe"," 0.0005","0.5% compare to 2007 in CO2-eq tonnes"
+"5","Monaco","62.43","62.05","61.67","61.28","60.90","60.52","Life support","ecosystem health","Aquatic habitats in favourable conservation status","Europe","100","%"
+"6","Monaco","10.41"," 9.53"," 9.63"," 9.88"," 9.21"," 9.21","Human health and welfare","human health","Concentrations of PM2.5","Europe","5","µg/m3"
+"7","Monaco","100.00000","100.00000","100.00000","100.00000","100.00000","100.00000","Human health and welfare","human health","Drinking water contamination","Europe","100","% without E.coli"

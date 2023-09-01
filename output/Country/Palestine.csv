@@ -1,0 +1,8 @@
+"","Country","X2015","X2016","X2017","X2018","X2019","X2020","Function","Subfunction","Indicator","Continent","ideal_state","unit"
+"1","Palestine",NA,NA,NA,NA,NA,NA,"Source","renewable ressources","state of forest reccources","Asia","100","%"
+"2","Palestine","37.84000","37.84000","37.50000","37.50000","37.50000","37.50000","Source","renewable ressources","Proportion of fish stocks not overexploited","Asia","100","% Sus fish stock"
+"3","Palestine","  41.53","  40.02","  41.08","  42.75","  47.01","  50.26","Source","renewable ressources","Surfacewater Stress","Asia","25","% of stress"
+"4","Palestine","3.333333e+01","3.333333e+01","3.466667e+01","3.600000e+01","3.866667e+01","4.000000e+01","Source","renewable ressources","Groundwater stress","Asia","25","%"
+"5","Palestine",NA,NA,NA,NA,"   31.90","   30.80","Sink","global System","Consumption of HCFC in ODP per capita","Asia"," 0.0000","0.5% compare to 2007 in CO2-eq tonnes"
+"6","Palestine",NA,NA,NA,NA,NA,NA,"Life support","ecosystem health","Terrestrial habitats in favourable conservation status","Asia","100","%"
+"7","Palestine"," 78.07105"," 78.39740"," 78.72343"," 79.04902"," 79.37425"," 79.69894","Human health and welfare","human health","Drinking water contamination","Asia","100","% without E.coli"

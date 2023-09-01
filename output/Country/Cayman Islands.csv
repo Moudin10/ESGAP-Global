@@ -1,0 +1,6 @@
+"","Country","X2015","X2016","X2017","X2018","X2019","X2020","Function","Subfunction","Indicator","Continent","ideal_state","unit"
+"1","Cayman Islands","9.702517e+01","9.702517e+01","9.702517e+01","9.771167e+01","9.702517e+01","9.702517e+01","Source","renewable ressources","state of forest reccources","America","100","%"
+"2","Cayman Islands","60.34000","60.34000","61.40000","61.40000","61.40000","61.40000","Source","renewable ressources","Proportion of fish stocks not overexploited","America","100","% Sus fish stock"
+"3","Cayman Islands","16.5208782","16.0061338","13.2127509","12.7791370","14.9775048","12.2142529","Sink","global System","CO2 emissions [tonnes per capita]","America","2.88","tonnes per year per capita"
+"4","Cayman Islands",NA,NA,NA,NA,NA,NA,"Life support","ecosystem health","Terrestrial habitats in favourable conservation status","America","100","%"
+"5","Cayman Islands","79.60","79.35","79.28","79.11","78.93","78.76","Life support","ecosystem health","Aquatic habitats in favourable conservation status","America","100","%"

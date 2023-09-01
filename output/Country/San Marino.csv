@@ -1,0 +1,7 @@
+"","Country","X2015","X2016","X2017","X2018","X2019","X2020","Function","Subfunction","Indicator","Continent","ideal_state","unit"
+"1","San Marino","1.000000e+02","1.000000e+02","1.000000e+02","1.000000e+02","1.000000e+02","1.000000e+02","Source","renewable ressources","state of forest reccources","Europe","100","%"
+"2","San Marino","12.21","12.21","12.21","12.21","12.21","12.21","Source","non-renewables ressources","area with tolerable erosion","Europe","2","Tonnes/hectare/year"
+"3","San Marino","    0.00","    0.00","    0.00","    0.00","    0.00","    0.00","Sink","global System","Consumption of HCFC in ODP per capita","Europe"," 0.0000","0.5% compare to 2007 in CO2-eq tonnes"
+"4","San Marino","58.06146","58.26622","58.46761","58.67103","58.87665","58.99567","Life support","ecosystem health","Terrestrial habitats in favourable conservation status","Europe","100","%"
+"5","San Marino","11.42","10.33","10.55","10.81"," 9.85"," 9.85","Human health and welfare","human health","Concentrations of PM2.5","Europe","5","µg/m3"
+"6","San Marino","100.00000","100.00000","100.00000","100.00000","100.00000","100.00000","Human health and welfare","human health","Drinking water contamination","Europe","100","% without E.coli"
